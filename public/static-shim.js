@@ -347,6 +347,36 @@
   FakeLicenseSocket.prototype.CLOSING = 2;
   FakeLicenseSocket.prototype.CLOSED = 3;
 
+  // ---- Subpath fixes (site served under e.g. /gravit-designer/) ----
+  // The bundle assumes it lives at the domain root: it pushState()s to "/"
+  // and registers the caching service worker as "/cacher.js". Rebase those
+  // root-absolute URLs onto the actual base path.
+
+  var BASE = location.pathname.replace(/[^/]*$/, ""); // ".../" of index.html
+  if (BASE !== "/") {
+    var rebase = function (url) {
+      return typeof url === "string" && url.charAt(0) === "/" && url.indexOf(BASE) !== 0
+        ? BASE + url.slice(1)
+        : url;
+    };
+
+    ["pushState", "replaceState"].forEach(function (fn) {
+      var orig = history[fn].bind(history);
+      history[fn] = function (state, title, url) {
+        return orig(state, title, url == null ? url : rebase(String(url)));
+      };
+    });
+
+    if (navigator.serviceWorker && navigator.serviceWorker.register) {
+      var origRegister = navigator.serviceWorker.register.bind(navigator.serviceWorker);
+      navigator.serviceWorker.register = function (scriptURL, options) {
+        var opts = options || {};
+        if (opts.scope) opts.scope = rebase(String(opts.scope));
+        return origRegister(rebase(String(scriptURL)), opts);
+      };
+    }
+  }
+
   function PatchedWebSocket(url, protocols) {
     var pathname = "";
     try {
