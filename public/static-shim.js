@@ -125,7 +125,22 @@
     return { body: body, contentType: "text/html" };
   }
 
+  // Google Drive client configuration (clientId / apiKey / appId), AES-encrypted
+  // with the key hardcoded in the bundle (see decrypt() in designer.browser.dev.js).
+  // These are publishable identifiers; the API key is referrer-restricted.
+  var GDRIVE_CONFIG_CIPHER =
+    "a275695fdb2803e8f960edfda5fe442e0a561506ee9b09c2fbd7fcd10924c4e9:lFRkogEU8YsXiLlyj4NveH55hsYpiXIONFpk49TjkFiisW2DJGXp3HNrpLuzl8/2A82a7s/KG23ofuEZijR23aHXG+QyeGS96PDipuk5ejrROrwU2gSmJWRK0YcydcKyv+Q9B86Xt55VcU5o9Z3qvcmIxzv3Olm6sD2eXE7LhciylwuA1fSrcmlA7v2WCiG+xAjvBdgLvn7Ile+N3E0rqr34wwXSOEyUK917uu/grYI2rA0GIYPz4oyOMZS2leuY520j7dNn+Sa2jx7H9lSS38bBGY6iiUenWdktTCj7hvs=";
+
   var ROUTES = [
+    {
+      m: "GET",
+      p: /\/cloudservices\/googledrive\/configuration$/,
+      h: function () {
+        // The client does JSON.parse(response) then decrypt(), so the HTTP
+        // body must be a JSON string literal containing the ciphertext.
+        return { body: JSON.stringify(GDRIVE_CONFIG_CIPHER), contentType: "application/json" };
+      },
+    },
     { m: "GET", p: /\/connection\/test$/, h: function () { return text("OK"); } },
     { m: "GET", p: /\/maintenance\/status$/, h: function () { return json({ maintenance: false }); } },
     { m: "GET", p: /\/i18n-url\/[^/]+\/designer$/, h: function () { return json({}); } },

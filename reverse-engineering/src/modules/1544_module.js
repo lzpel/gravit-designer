@@ -1,9 +1,10 @@
 /**
  * Webpack Module #1544
  * Type: unknown
+ * Restored from designer.browser.original.js L143335-144532 (full new-document dialog with cloud save/open panes)
  */
 
-function (e, t, n) {
+  function (e, t, n) {
     "use strict";
     var o = n(16);
     n(58), n(57), n(8), n(71), n(4), n(13), n(32), n(33);
@@ -51,7 +52,9 @@ function (e, t, n) {
             .text(i.GLocale.get(new i.GLocaleKey("GLocale", "loading")) + "...")
         );
       var o = $("<div></div>").addClass("sidebar").appendTo(this._dialog);
-
+      a.LICENSE.UPGRADEABLE &&
+        (gDesigner.getApplicationManager().isLicenseUpgradeable() ||
+          o.addClass("on-pro"));
       var s = $("<div/>").addClass("sidebar-options").appendTo(o),
         u = $("<div></div>").addClass("frame").appendTo(this._dialog),
         p = this._createPresetsFrame().appendTo(u),
@@ -122,6 +125,95 @@ function (e, t, n) {
             n._isSpectatorMode() || m(".start-option");
         }
       ),
+        this._createSeparator(s, "templates-option"),
+        this._createOption(
+          s,
+          i.GLocale.get(
+            new i.GLocaleKey("GNewDocumentDialog", "text.templates-option")
+          ),
+          i.GLocale.get(
+            new i.GLocaleKey(
+              "GNewDocumentDialog",
+              "text.templates-option-description"
+            )
+          ),
+          "templates-option",
+          function (e) {
+            if (n._isSpectatorMode()) return;
+            const t = function () {
+              e || gDesigner.stats("newdocumentdialog_click_templates"),
+                gDesigner.getUser().then((e) => {
+                  let t = (e) => {
+                    if (!e) return u.removeClass("loading"), void y();
+                    n._loadTemplates();
+                  };
+                  e
+                    ? t(e)
+                    : a.LOGIN_DIALOGS.POPUP
+                    ? h.performLogin().then(t)
+                    : n._createCloudLoginFrame("template", t, u);
+                });
+            };
+            gDesigner.isOffline() ? l.default.openUnavailableFeature(t) : t();
+          }
+        ),
+        this._createSeparator(s, "cloud-option"),
+        this._createOption(
+          s,
+          i.GLocale.get(
+            new i.GLocaleKey("GNewDocumentDialog", "text.cloud-option")
+          ),
+          i.GLocale.get(
+            new i.GLocaleKey(
+              "GNewDocumentDialog",
+              "text.cloud-option-description"
+            )
+          ),
+          "cloud-option",
+          function (e, t, o, i, r, s) {
+            const c = function () {
+              e || gDesigner.stats("newdocumentdialog_open_cloudfiles"),
+                n._openFromCloud
+                  ? (u.children().detach(),
+                    u.addClass("loading"),
+                    m(".cloud-option"),
+                    f.isMaximized().then((e) => {
+                      e &&
+                        u.closest(".g-dialog-container").addClass("fullscreen");
+                    }),
+                    gDesigner.getUser().then((e) => {
+                      let l = (e) => {
+                        if ((u.children().detach(), !e))
+                          return u.removeClass("loading"), void n.close();
+                        g || (g = $("<div/>").addClass("cloud-workspace")),
+                          u.append(g),
+                          g.empty(),
+                          n._loadCloudFiles(g, t, o, i, r, s);
+                      };
+                      e
+                        ? l(e)
+                        : a.LOGIN_DIALOGS.POPUP
+                        ? h.performLogin().then(l)
+                        : n._createCloudLoginFrame("cloud", l, u);
+                    }))
+                  : new _(() => {
+                      let e = {
+                        closable: !0,
+                        showCloudOptions: !0,
+                        openFromCloud: !0,
+                        closeCallback: () => {
+                          n._parentDialogInstance &&
+                            n._parentDialogInstance.close();
+                        },
+                      };
+                      new C(n).open(e);
+                    });
+            };
+            return gDesigner.isOffline()
+              ? l.default.openUnavailableFeature(c)
+              : c();
+          }
+        ),
         this._createSeparator(s, "local-option"),
         this._createOption(
           s,
@@ -214,7 +306,41 @@ function (e, t, n) {
         }.bind(this),
         !0
       );
-      this._createSeparator(s);
+      this._createSeparator(s),
+        a.LICENSE.UPGRADEABLE &&
+          $("<div></div>")
+            .addClass("activate-trial")
+            .css(
+              "display",
+              gDesigner.getApplicationManager().isLicenseUpgradeable()
+                ? ""
+                : "none"
+            )
+            .append(
+              $("<div></div>")
+                .addClass("title")
+                .html(
+                  i.GLocale.get(
+                    new i.GLocaleKey("GNewDocumentDialog", "text.try-out-pro")
+                  )
+                )
+            )
+            .append(
+              $("<div></div>")
+                .addClass("subtitle")
+                .html(
+                  i.GLocale.get(
+                    new i.GLocaleKey(
+                      "GNewDocumentDialog",
+                      "text.start-free-trial"
+                    )
+                  )
+                )
+            )
+            .on("click", () =>
+              gDesigner.activateTrialLicense().then(() => this._updateUI())
+            )
+            .appendTo(o);
       var b = $("<div></div>").addClass("footer").appendTo(o),
         w = $("<div />").addClass("links-container").appendTo(b),
         x = $("<div/>").addClass("links-column").appendTo(w),
@@ -355,7 +481,18 @@ function (e, t, n) {
         this._updateUI();
       }),
       (C.prototype._updateUI = function () {
-        this._updateForUserLicense();
+        if (a.LICENSE.UPGRADEABLE) {
+          const e = gDesigner.getApplicationManager().isLicenseUpgradeable();
+          this._dialog.find(".activate-trial").css("display", e ? "" : "none"),
+            this._dialog.find(".sidebar").toggleClass("on-pro", !e);
+        }
+        this._dialog
+          .find(".templates-option")
+          .css("display", gDesigner.isOffline() ? "none" : ""),
+          this._dialog
+            .find(".cloud-option")
+            .css("display", gDesigner.isOffline() ? "none" : ""),
+          this._updateForUserLicense();
       }),
       (C.prototype.getDialogElement = function () {
         return this._dialog;
@@ -478,6 +615,27 @@ function (e, t, n) {
             ),
             links: [
               {
+                href: "",
+                labelLocale: new i.GLocaleKey(
+                  "GNewDocumentDialog",
+                  "text.example-files"
+                ),
+                statType: "newdocumentdialog_click_example-files",
+                click: () => {
+                  const e = () =>
+                    new C().open({
+                      closable: !0,
+                      openFromCloud: !0,
+                      showCloudOptions: !0,
+                      nativeCloud: !0,
+                      showExampleFiles: !0,
+                    });
+                  gDesigner.isOffline()
+                    ? l.default.openUnavailableFeature(e)
+                    : e();
+                },
+              },
+              {
                 href: v,
                 labelLocale: new i.GLocaleKey(
                   "GOpenLinkAction",
@@ -485,7 +643,7 @@ function (e, t, n) {
                 ),
               },
               {
-                href: "/docs/index.html",
+                href: "",
                 labelLocale: new i.GLocaleKey(
                   "GOpenLinkAction",
                   "title.user-guide"
@@ -543,7 +701,48 @@ function (e, t, n) {
                 ])
             )
             .appendTo(n);
-        });
+        }),
+          $("<div/>")
+            .addClass("preset")
+            .append(
+              $("<p/>")
+                .addClass("title")
+                .text(
+                  i.GLocale.get(
+                    new i.GLocaleKey(
+                      "GNewDocumentDialog",
+                      "text.templates-option"
+                    )
+                  )
+                )
+            )
+            .append(
+              $("<div/>")
+                .addClass("icon")
+                .on("click", () => {
+                  this._isSpectatorMode() ||
+                    this._dialog
+                      .find(".sidebar-options")
+                      .find(".templates-option")
+                      .trigger("click");
+                })
+                .css("padding-bottom", "42px")
+                .append(
+                  $("<img/>").attr(
+                    "src",
+                    "assets/img/new-document/preset-templates-white.svg"
+                  )
+                )
+                .append(
+                  $("<img/>")
+                    .attr(
+                      "src",
+                      "assets/img/new-document/preset-templates-black.svg"
+                    )
+                    .addClass("hover")
+                )
+            )
+            .appendTo(n);
         var o = (e) =>
           13 === e.keyCode ? this._newDocumentCustomSize() : void 0;
         return (
@@ -651,16 +850,156 @@ function (e, t, n) {
           e
         );
       }),
-
+      (C.prototype._createCloudLoginFrame = function (e, t, n) {
+        if (0 === $(n).children().length) {
+          n.removeClass("loading");
+          var o = $("<div/>").addClass("cloud-login").addClass(e),
+            a = "template" === e;
+          $("<div/>").addClass("cloud-logo").addClass(e).appendTo(o);
+          var r = a
+              ? i.GLocale.get(
+                  new i.GLocaleKey(
+                    "GNewDocumentDialog",
+                    "text.templates-login-title"
+                  )
+                )
+              : i.GLocale.get(
+                  new i.GLocaleKey(
+                    "GNewDocumentDialog",
+                    "text.cloud-login-title"
+                  )
+                ),
+            s = a
+              ? i.GLocale.get(
+                  new i.GLocaleKey(
+                    "GNewDocumentDialog",
+                    "text.templates-login-phrase1"
+                  )
+                )
+              : i.GLocale.get(
+                  new i.GLocaleKey(
+                    "GNewDocumentDialog",
+                    "text.cloud-login-phrase1"
+                  )
+                ),
+            l = a
+              ? i.GLocale.get(
+                  new i.GLocaleKey(
+                    "GNewDocumentDialog",
+                    "text.templates-login-phrase2"
+                  )
+                )
+              : i.GLocale.get(
+                  new i.GLocaleKey(
+                    "GNewDocumentDialog",
+                    "text.cloud-login-phrase2"
+                  )
+                );
+          $("<div/>").html(r).addClass("title").addClass(e).appendTo(o),
+            $("<div/>")
+              .html(s)
+              .addClass("subtitle")
+              .addClass("first")
+              .addClass(e)
+              .appendTo(o),
+            $("<div/>")
+              .html(l)
+              .addClass("subtitle")
+              .addClass("second")
+              .addClass(e)
+              .appendTo(o),
+            $("<div/>")
+              .addClass("login-buttons")
+              .append(
+                $("<div/>")
+                  .addClass("g-button cloud-login-button")
+                  .addClass("login")
+                  .html(
+                    i.GLocale.get(
+                      new i.GLocaleKey("GNewDocumentDialog", "text.cloud-login")
+                    )
+                  )
+                  .on("click", function () {
+                    h.performLogin().then(function (e) {
+                      t && t(e);
+                    });
+                  })
+              )
+              .append(
+                $("<div/>")
+                  .addClass("g-button cloud-login-button")
+                  .html(
+                    i.GLocale.get(
+                      new i.GLocaleKey(
+                        "GNewDocumentDialog",
+                        "text.cloud-signup"
+                      )
+                    )
+                  )
+                  .on("click", function () {
+                    h.performSignup().then(function (e) {
+                      t && t(e);
+                    });
+                  })
+              )
+              .appendTo(o),
+            n.append(o);
+        }
+      }),
+      (C.prototype._loadCloudFiles = function (e, t, n, o, i, a) {
+        this.handled = !1;
+        var r = new f({
+            parentComponent: e,
+            closeCallback: async function (e) {
+              (this.handled = !0),
+                await this.close(),
+                this._parentDialogInstance &&
+                  (await this._parentDialogInstance.close()),
+                e || (n && n());
+            }.bind(this),
+            documentToSave: t,
+            cancelSave: async function () {
+              (this.handled = !0), await this.close(), n && n();
+            }.bind(this),
+            defaultFilename: o,
+            readyStateChange: this.readyStateChange,
+            nativeCloud: i,
+            showExampleFiles: a,
+          }),
+          s = () => {
+            var e = this._closeCallbackListeners.indexOf(s);
+            this._closeCallbackListeners.splice(e, 1),
+              this.handled || (n && n()),
+              r.handleParentClose();
+          };
+        this._closeCallbackListeners.push(s);
+      }),
+      (C.prototype._loadTemplates = function () {
+        new m(
+          function () {
+            this.close();
+          }.bind(this)
+        );
+      }),
       (C.prototype.open = function (e) {
         let {
           closable: t,
           cb: n,
+          showCloudOptions: o,
+          openFromCloud: i,
           defaultOption: a,
+          newOrFromTemplate: r,
+          documentToSave: s,
+          cancelSaveCallback: l,
+          defaultFilename: c,
           closeCallback: d,
+          nativeCloud: u,
+          showExampleFiles: p,
         } = e;
         (this._cb = n || null),
-          (this._closeCallback = d);
+          (this._closeCallback = d),
+          (this._openFromCloud = i);
+        h.isOnline();
         var g = function () {
             this._dialog.find(".sidebar").css("display", ""),
               this._dialog
@@ -675,7 +1014,22 @@ function (e, t, n) {
               this._dialog.find(".sidebar").find(".version").css("display", "");
           }.bind(this),
           f = function () {
+            this._dialog.find(".cloud-option").css("display", o ? "" : "none"),
               this._dialog.find(".option.start-option").trigger("click"),
+              this._dialog.find(".frame").removeClass("cloud-frame"),
+              this._dialog
+                .find(".g-dialog-content")
+                .removeClass("cloud-dialog"),
+              this._dialog.parent().removeClass("cloud-files-dialog"),
+              o &&
+                i &&
+                (this._dialog.find(".sidebar").css("display", "none"),
+                this._dialog.addClass("cloud-dialog"),
+                this._dialog.parent().addClass("cloud-files-dialog"),
+                this._dialog.find(".frame").addClass("cloud-frame"),
+                this._dialog
+                  .find(".cloud-option")
+                  .trigger("click", [s, l, c, u, p])),
               a && this._dialog.find("." + a).trigger("click");
           }.bind(this);
         this._dialog.gDialog("open", t),
@@ -687,18 +1041,65 @@ function (e, t, n) {
           }),
           gDesigner.addEventListener(w, this._licenseChangedEvent, this);
       }),
+      (C.prototype.saveCloudFile = function (e, t, n, o, i) {
+        let a = {
+          closable: !0,
+          showCloudOptions: !0,
+          openFromCloud: !0,
+          cancelSaveCallback: t,
+          documentToSave: e,
+          defaultFilename: n,
+          nativeCloud: i,
+        };
+        (this.readyStateChange = o), this.open(a);
+      }),
       (C.prototype.isOpen = function () {
         return this._dialog.gDialog("isOpen");
       }),
       (C.prototype.close = function () {
         return (
+          this._dialog.parent().removeClass("cloud-files-dialog"),
           this._dialog.gDialog("close", !1, 0),
           (0, s.sleep)(0)
         );
       }),
       (C.prototype._newDocumentFromPreset = async function (e, t, n) {
-        var r = e.layouts[t];
-        this._newDocument(r.width, r.height, r.unit, r.dpi);
+        var o = this._dialog.find(".frame"),
+          r = e.layouts[t];
+        if (
+          (gDesigner.stats(
+            "newdocumentdialog_new_document-from-preset",
+            n ||
+              (r.localeClass
+                ? i.GLocale.get(r.localeClass, null, i.GLocaleLanguage.English)
+                : r.name),
+            !1,
+            !0
+          ),
+          gDesigner
+            .getAmplitudeHelper()
+            .logEvent(a.AmplitudeData.Events.DOCUMENT_CREATED, {
+              DOCUMENT_CATEGORY: e.nameEn,
+              DOCUMENT_TYPE: this._getLayoutDisplayName(r),
+              DOCUMENT_TEMPLATE_ID: e.id,
+            }),
+          r.template)
+        )
+          try {
+            o.addClass("loading");
+            var s = new u(),
+              l = await a.gApi.getPresetTemplate({ type: r.template });
+            o.removeClass("loading"),
+              gDesigner.addDocument(s),
+              s.setDocumentFromTemplate(!0),
+              s.loadFromData(l.data),
+              this.close(),
+              this._cb && this._cb();
+          } catch (e) {
+            o.hasClass("loading") && o.removeClass("loading"),
+              this._newDocument(r.width, r.height, r.unit, r.dpi);
+          }
+        else this._newDocument(r.width, r.height, r.unit, r.dpi);
       }),
       (C.prototype._newDocumentCustomSize = function () {
         gDesigner.stats("newdocumentdialog_new_custom-sized"),

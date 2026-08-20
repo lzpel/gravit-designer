@@ -486,10 +486,14 @@ function (e, t, n) {
             plugins: [],
             actions: [new ae(), new yt(), new re(), new xe(), new Se()]
               .concat([
+                new pt(pt.Actions.Open),
                 new vt(),
                 new Pe(),
                 new Le(zn),
                 ...qn.map((e) => new Le(e)),
+                new pt(pt.Actions.SaveAs),
+                new St(),
+                new Et(),
                 new Wt(),
               ])
               .concat([new De()])
