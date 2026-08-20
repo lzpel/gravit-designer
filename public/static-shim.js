@@ -114,6 +114,28 @@
     },
   };
 
+  // ---- Default settings seed ----
+  // The app persists user settings in localStorage("designer.settings") and
+  // its built-in default for auto_save is false. Seed it to true (5 min
+  // interval) so cloud documents get autosave out of the box; an explicit
+  // user choice in the Settings dialog is never overridden.
+  try {
+    var settingsRaw = window.localStorage.getItem("designer.settings");
+    var settingsObj = settingsRaw ? JSON.parse(settingsRaw) : {};
+    var settingsDirty = false;
+    if (!Object.prototype.hasOwnProperty.call(settingsObj, "auto_save")) {
+      settingsObj.auto_save = true;
+      settingsDirty = true;
+    }
+    if (!Object.prototype.hasOwnProperty.call(settingsObj, "auto_save_interval")) {
+      settingsObj.auto_save_interval = 5;
+      settingsDirty = true;
+    }
+    if (settingsDirty) {
+      window.localStorage.setItem("designer.settings", JSON.stringify(settingsObj));
+    }
+  } catch (e) { /* localStorage unavailable */ }
+
   // ---- Route table ----
   // Handlers receive the parsed URL object and the raw request body (if any)
   // and return { body, contentType?, status? }. body objects are JSON-encoded.
