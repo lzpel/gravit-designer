@@ -142,6 +142,14 @@
       },
     },
     { m: "GET", p: /\/connection\/test$/, h: function () { return text("OK"); } },
+    { m: "HEAD", p: /\/connection\/test$/, h: function () { return text(""); } },
+    // Per-file side channels the client calls for cloud-backed documents.
+    // Drive storage handles the real data; these only need harmless answers.
+    { m: "PUT", p: /\/file\/[^/]+\/data$/, h: function () { return json({ data: { notifications_disabled: 0 } }); } },
+    { m: "GET", p: /\/file\/[^/]+\/annotations$/, h: function () { return json({}); } },
+    { m: "PUT", p: /\/file\/[^/]+\/annotations$/, h: function () { return json({}); } },
+    { m: "PUT", p: /\/file\/[^/]+\/usage$/, h: function () { return json({}); } },
+    { m: "POST", p: /\/file\/[^/]+\/access$/, h: function () { return json({}); } },
     { m: "GET", p: /\/maintenance\/status$/, h: function () { return json({ maintenance: false }); } },
     { m: "GET", p: /\/i18n-url\/[^/]+\/designer$/, h: function () { return json({}); } },
     { m: "GET", p: /\/license$/, h: function () { return json(LICENSE); } },
